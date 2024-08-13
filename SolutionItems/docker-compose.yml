@@ -1,0 +1,109 @@
+networks:
+  lancamentos-network:
+    driver: bridge
+
+volumes:
+  rabbitmq_data:
+  redis_data:
+
+services:
+  lancamentos.sqlserver:
+    container_name: lancamentos.sqlserver
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    networks:
+      - lancamentos-network
+    volumes:
+      - ./data:/var/opt/mssql/data
+    environment:
+      MSSQL_SA_PASSWORD: "123Aa321"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+      MSSQL_TCP_PORT: 1433
+    ports:
+      - "1433:1433"
+
+  lancamentos.redis:
+    container_name: lancamentos.redis
+    image: redis:alpine
+    ports:
+      - "16379:6379"
+    networks:
+      - lancamentos-network
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: "2g"
+        reservations:
+          cpus: "1.5"
+          memory: "1g"
+    command: redis-server --appendonly yes --maxmemory 1g --maxmemory-policy allkeys-lru --tcp-backlog 511 --maxclients 10000
+    volumes:
+      - redis_data:/data
+    restart: always
+
+  lancamentos.rabbitmq:
+    image: rabbitmq:3-management
+    container_name: lancamentos.rabbitmq
+    networks:
+      - lancamentos-network
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  lancamentos.api.controle:
+    container_name: lancamentos.api.controle
+    image: ${DOCKER_REGISTRY-}lancamentoscontroleapi
+    build:
+      context: ../
+      dockerfile: Lancamentos.Controle/Lancamentos.Controle.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=5000
+      - ASPNETCORE_HTTP_PORTS=5001
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+    volumes:
+      - ./conf.d/https/controle/:/https/
+    networks:
+      - lancamentos-network
+    depends_on:
+      - lancamentos.sqlserver
+
+  lancamentos.api.consolidado:
+    container_name: lancamentos.api.consolidado
+    image: ${DOCKER_REGISTRY-}lancamentosconsolidadoapi
+    build:
+      context: ../
+      dockerfile: Lancamentos.Consolidado/Lancamentos.Consolidado.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=6000
+      - ASPNETCORE_HTTP_PORTS=6001
+      - ASPNETCORE_Kestrel__Limits__MaxConcurrentConnections=1000
+      - ASPNETCORE_Kestrel__Limits__MaxConcurrentUpgradedConnections=1000
+      - ASPNETCORE_Kestrel__Limits__MaxRequestBodySize=52428800
+    ports:
+      - "6000:6000"
+      - "6001:6001"
+    networks:
+      - lancamentos-network
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"
+          memory: "4g"
+        reservations:
+          cpus: "2.0"
+          memory: "2g"
+    volumes:
+      - ./conf.d/https/consolidado/:/https/
+    depends_on:
+      - lancamentos.redis
+    restart: always
