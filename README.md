@@ -17,6 +17,10 @@ A solução desenvolvida contempla os seguintes componentes:
 
 ![Desenho da solução](SolutionItems/design/desenho-solucao.svg)
 
+## Estrutura projeto (Visual Studio)
+
+![Estrutura Projeto VS](SolutionItems/prints/estrutura.png)
+
 
 ## Instruções para execução da aplicação
 
@@ -28,3 +32,8 @@ Basta executar os arquivos .bat abaixo para testar todos os cenários da soluç�
 - [Parar aplicação](SolutionItems/env-stop.bat)
 - [Parar Serviço para Controle de Lançamentos](SolutionItems/servico-controle-stop.bat)
 - [Reiniciar Serviço para Controle de Lançamentos](SolutionItems/servico-controle-restart.bat)
+
+Teste de carga:
+- Executar a class libray Lancamentos.Consolidado.Tests.LoadTests
+ 
+![Teste de carga](SolutionItems/prints/teste-carga.png)
