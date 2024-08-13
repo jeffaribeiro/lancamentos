@@ -17,6 +17,10 @@ A solução desenvolvida contempla os seguintes componentes:
 
 ![Desenho da solução](SolutionItems/design/desenho-solucao.svg)
 
+## Estrutura projeto (Visual Studio)
+
+![Estrutura Projeto VS](SolutionItems/prints/estrutura.png)
+
 
 ## Instruções para execução da aplicação
 
@@ -28,3 +32,15 @@ Basta executar os arquivos .bat abaixo para testar todos os cenários da soluç�
 - [Parar aplicação](SolutionItems/env-stop.bat)
 - [Parar Serviço para Controle de Lançamentos](SolutionItems/servico-controle-stop.bat)
 - [Reiniciar Serviço para Controle de Lançamentos](SolutionItems/servico-controle-restart.bat)
+
+URLs:
+- API Controle de Lançamwntos: 127.0.0.1:5001/swagger/index.html ou localhost:5001/swagger/index.html
+- API Consolidado Diário: 127.0.0.1:6001/swagger/index.html ou localhost:6001/swagger/index.html
+- RabbitMQ Admin: 127.0.0.1:15672 ou localhost:15672 (user: guest | pass: guest)
+- SQL Server: localhost:1433 (user:sa | pass: 123Aa321)
+- Redis: localhost:6379
+
+Teste de carga:
+- Executar a class libray Lancamentos.Consolidado.Tests.LoadTests
+ 
+![Teste de carga](SolutionItems/prints/teste-carga.png)
